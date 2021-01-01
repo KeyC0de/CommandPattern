@@ -55,7 +55,7 @@ protected:
 public:
 	constexpr int getTypeId()
 	{
-		typeId = getUniqueValueForType<Command<T>>();
+		typeId = static_cast<int>( getUniqueValueForType<Command<T>>() );
 		return typeId;
 	}
 
