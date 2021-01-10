@@ -1,8 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <type_traits>
 #include <memory>
+
 
 namespace
 {
@@ -43,7 +42,9 @@ class Command
 	//std::stack<Command<T>> commands;
 	static inline int typeId;
 protected:
-	explicit Command( int state, int previousState, int nextState )
+	explicit Command( int state,
+		int previousState,
+		int nextState )
 		:
 		m_state( state ),
 		m_previousState( previousState ),
@@ -94,72 +95,30 @@ class JumpCommand final
 {
 	// each command can have other state here
 public:
-	explicit JumpCommand()
-		:
-		Command<JumpCommand>( 0, 0, 0 )
-	{}
-
-	void execute()
-	{
-		std::cout << "Jump around! Jump around! Jump up, jump up and get down!\n Jump Jump Jump!\n";
-	}
-
-	void undo()
-	{
-
-	}
-	void redo()
-	{
-
-	}
+	explicit JumpCommand();
+	void execute();
+	void undo();
+	void redo();
 };
 
 class DuckCommand final
 	: public Command<DuckCommand>
 {
 public:
-	explicit DuckCommand()
-		:
-		Command( 0, 0, 0 )
-	{}
-
-	void execute()
-	{
-		std::cout << "Duck! The DUck!\n";
-	}
-
-	void undo()
-	{
-
-	}
-	void redo()
-	{
-
-	}
+	explicit DuckCommand();
+	void execute();
+	void undo();
+	void redo();
 };
 
 class FireCommand final
 	: public Command<FireCommand>
 {
 public:
-	explicit FireCommand()
-		:
-		Command( 0, 0, 0 )
-	{}
-
-	void execute()
-	{
-		std::cout << "Fire all missiles!\n";
-	}
-
-	void undo() 
-	{
-
-	}
-	void redo() 
-	{
-
-	}
+	explicit FireCommand();
+	void execute();
+	void undo();
+	void redo();
 };
 
 
@@ -178,12 +137,7 @@ private:
 	std::unique_ptr<DuckCommand> m_duckCommand;
 	std::unique_ptr<FireCommand> m_fireCommand;
 public:
-	explicit CommandHandler()
-		:
-		m_jumpCommand( std::make_unique<JumpCommand>() ),
-		m_duckCommand( std::make_unique<DuckCommand>() ),
-		m_fireCommand( std::make_unique<FireCommand>() )
-	{}
+	explicit CommandHandler();
 	~CommandHandler() = default;
 	CommandHandler( const CommandHandler& ) = delete;
 	CommandHandler& operator=( const CommandHandler& ) = delete;
@@ -197,27 +151,6 @@ public:
 	template<typename T>
 	void executeCommand( Command<T>& command );
 };
-
-CommandHandler::CommandHandler( CommandHandler&& rhs ) noexcept
-	:
-	m_jumpCommand{ std::move( rhs.m_jumpCommand ) },
-	m_duckCommand{ std::move( rhs.m_duckCommand ) },
-	m_fireCommand{ std::move( rhs.m_fireCommand ) }
-{}
-
-CommandHandler& CommandHandler::operator=( CommandHandler&& rhs ) noexcept
-{
-	if ( this != &rhs )
-	{
-		CommandHandler temp( std::move( rhs ) );
-		std::swap( this->m_jumpCommand, temp.m_jumpCommand );
-		std::swap( this->m_duckCommand, temp.m_duckCommand );
-		std::swap( this->m_fireCommand, temp.m_fireCommand );
-	}
-	return *this;
-}
-
-
 
 template<typename T>
 void CommandHandler::executeCommand( Command<T>& command )

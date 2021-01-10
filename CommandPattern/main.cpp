@@ -1,3 +1,4 @@
+#include <iostream>
 #include "command.h"
 
 
@@ -5,8 +6,10 @@ int main()
 {
 	JumpCommand jumpCommand1;
 	JumpCommand jumpCommand2;
-	std::cout << "jumpCommand1 type id = " << jumpCommand1.getTypeId() << '\n';
-	std::cout << "jumpCommand2 type id = " << jumpCommand2.getTypeId() << '\n';
+	std::cout << "jumpCommand1 type id = "
+		<< jumpCommand1.getTypeId() << '\n';
+	std::cout << "jumpCommand2 type id = "
+		<< jumpCommand2.getTypeId() << '\n';
 
 	DuckCommand duckCommand;
 	FireCommand fireCommand;
