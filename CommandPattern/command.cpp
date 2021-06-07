@@ -84,10 +84,9 @@ CommandHandler& CommandHandler::operator=( CommandHandler&& rhs ) noexcept
 {
 	if ( this != &rhs )
 	{
-		CommandHandler temp( std::move( rhs ) );
-		std::swap( this->m_jumpCommand, temp.m_jumpCommand );
-		std::swap( this->m_duckCommand, temp.m_duckCommand );
-		std::swap( this->m_fireCommand, temp.m_fireCommand );
+		std::swap( this->m_jumpCommand, rhs.m_jumpCommand );
+		std::swap( this->m_duckCommand, rhs.m_duckCommand );
+		std::swap( this->m_fireCommand, rhs.m_fireCommand );
 	}
 	return *this;
 }
