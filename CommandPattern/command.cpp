@@ -77,6 +77,17 @@ CommandHandler::CommandHandler()
 
 }
 
+CommandHandler::CommandHandler( JumpCommand* jmpCmd,
+	DuckCommand* duckCmd,
+	FireCommand* fireCmd )
+	:
+	m_pJumpCommand{jmpCmd},
+	m_pDuckCommand{duckCmd},
+	m_pFireCommand{fireCmd}
+{
+
+}
+
 CommandHandler::CommandHandler( CommandHandler&& rhs ) noexcept
 	:
 	m_pJumpCommand{std::move( rhs.m_pJumpCommand )},

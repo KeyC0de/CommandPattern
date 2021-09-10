@@ -39,7 +39,7 @@ class Command
 	// eg. state could be x, y, z vars and previousState could be xBefore, yBefore, zBefore
 	//      thus support for undoable operations comes with the doubling of memory required per a Command object (n levels on undo means * n amount of storage required)
 	//template<typename T>
-	//std::stack<Command<T>> commands;
+	//std::stack<Command<T>> m_commands;
 	static inline int typeId;
 protected:
 	explicit Command( int state,
@@ -60,6 +60,26 @@ public:
 		return typeId;
 	}
 
+	Command( const Command& rhs ) = delete;
+	Command& operator=( const Command& rhs ) = delete;
+
+	Command( Command&& rhs ) noexcept
+		:
+		m_state{std::move( rhs.m_state )},
+		m_previousState{std::move( rhs.m_previousState )},
+		m_nextState{std::move( rhs.m_nextState )}
+	{
+		typeId = type_id<Command<T>>();
+	}
+	
+	Command& operator=( Command&& rhs ) noexcept
+	{
+		std::swap( m_state, rhs.m_state );
+		std::swap( m_previousState, rhs.m_previousState );
+		std::swap( m_nextState, rhs.m_nextState );
+		return *this;
+	}
+
 	//===================================================
 	//	\function	execute
 	//	\brief  executes the command
@@ -78,12 +98,12 @@ public:
 		m_nextState = m_state;
 		m_state = m_previousState;
 		static_cast<T*>( this )->undo();
-		std::cout << "Undoing previous JumpCommand as requested\n";
+		std::cout << "Undoing previous Command as requested\n";
 	}
 
 	void redo()
 	{
-		std::cout << "Redoing previous JumpCommand as requested\n";
+		std::cout << "Redoing previous Command as requested\n";
 		m_previousState = m_state;
 		m_state = m_nextState;
 		static_cast<T*>( this )->redo();
@@ -95,7 +115,7 @@ class JumpCommand final
 {
 	// each command can have other state here
 public:
-	explicit JumpCommand();
+	JumpCommand();
 	void execute();
 	void undo();
 	void redo();
@@ -105,7 +125,7 @@ class DuckCommand final
 	: public Command<DuckCommand>
 {
 public:
-	explicit DuckCommand();
+	DuckCommand();
 	void execute();
 	void undo();
 	void redo();
@@ -115,7 +135,7 @@ class FireCommand final
 	: public Command<FireCommand>
 {
 public:
-	explicit FireCommand();
+	FireCommand();
 	void execute();
 	void undo();
 	void redo();
@@ -138,6 +158,7 @@ private:
 	std::unique_ptr<FireCommand> m_pFireCommand;
 public:
 	explicit CommandHandler();
+	CommandHandler( JumpCommand* jmpCmd, DuckCommand* duckCmd, FireCommand* fireCmd );
 	~CommandHandler() = default;
 
 	CommandHandler( const CommandHandler& ) = delete;
