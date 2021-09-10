@@ -13,7 +13,7 @@ enum class CommandId
 	FIRE
 };
 
-inline std::size_t getNextValue()
+inline std::size_t getNextUniqueTypeId()
 {
 	static std::size_t id = 0;
 	std::size_t result = id;
@@ -22,9 +22,9 @@ inline std::size_t getNextValue()
 }
 
 template<typename T>
-constexpr std::size_t getUniqueValueForType()
+constexpr std::size_t type_id()
 {
-	static std::size_t typeId = getNextValue();
+	static std::size_t typeId = getNextUniqueTypeId();
 	return typeId;
 }
 
@@ -46,9 +46,9 @@ protected:
 		int previousState,
 		int nextState )
 		:
-		m_state( state ),
-		m_previousState( previousState ),
-		m_nextState( nextState )
+		m_state(state),
+		m_previousState(previousState),
+		m_nextState(nextState)
 	{
 		static_assert( std::is_base_of_v<Command, T>,
 			"Derived class doesn't inherit from Command! Exiting.." );
@@ -56,7 +56,7 @@ protected:
 public:
 	constexpr int getTypeId()
 	{
-		typeId = static_cast<int>( getUniqueValueForType<Command<T>>() );
+		typeId = static_cast<int>( type_id<Command<T>>() );
 		return typeId;
 	}
 
@@ -133,12 +133,13 @@ public:
 class CommandHandler final
 {
 private:
-	std::unique_ptr<JumpCommand> m_jumpCommand;
-	std::unique_ptr<DuckCommand> m_duckCommand;
-	std::unique_ptr<FireCommand> m_fireCommand;
+	std::unique_ptr<JumpCommand> m_pJumpCommand;
+	std::unique_ptr<DuckCommand> m_pDuckCommand;
+	std::unique_ptr<FireCommand> m_pFireCommand;
 public:
 	explicit CommandHandler();
 	~CommandHandler() = default;
+
 	CommandHandler( const CommandHandler& ) = delete;
 	CommandHandler& operator=( const CommandHandler& ) = delete;
 	CommandHandler( CommandHandler&& rhs ) noexcept;
@@ -146,27 +147,24 @@ public:
 	
 	//===================================================
 	//	\function	executeCommand
-	//	\brief  handles commands
+	//	\brief  dispatches commands
 	//	\date	2020/11/04 0:26
 	template<typename T>
-	void executeCommand( Command<T>& command );
-};
-
-template<typename T>
-void CommandHandler::executeCommand( Command<T>& command )
-{
-	switch( command.getTypeId() )
+	void executeCommand( Command<T>& command )
 	{
-	case static_cast<int>( CommandId::JUMP ):
-		command.execute();
-		break;
-	case static_cast<int>( CommandId::DUCK ):
-		command.execute();
-		break;
-	case static_cast<int>( CommandId::FIRE ):
-		command.execute();
-		break;
-	default:
-		break;
+		switch( command.getTypeId() )
+		{
+		case static_cast<int>( CommandId::JUMP ):
+			command.execute();
+			break;
+		case static_cast<int>( CommandId::DUCK ):
+			command.execute();
+			break;
+		case static_cast<int>( CommandId::FIRE ):
+			command.execute();
+			break;
+		default:
+			break;
+		}
 	}
-}
+};
