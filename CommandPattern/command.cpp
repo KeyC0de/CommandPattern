@@ -63,44 +63,8 @@ void FireCommand::undo()
 {
 
 }
+
 void FireCommand::redo()
 {
 
-}
-
-CommandHandler::CommandHandler()
-	:
-	m_pJumpCommand{std::make_unique<JumpCommand>()},
-	m_pDuckCommand{std::make_unique<DuckCommand>()},
-	m_pFireCommand{std::make_unique<FireCommand>()}
-{
-
-}
-
-CommandHandler::CommandHandler( JumpCommand* jmpCmd,
-	DuckCommand* duckCmd,
-	FireCommand* fireCmd )
-	:
-	m_pJumpCommand{jmpCmd},
-	m_pDuckCommand{duckCmd},
-	m_pFireCommand{fireCmd}
-{
-
-}
-
-CommandHandler::CommandHandler( CommandHandler&& rhs ) noexcept
-	:
-	m_pJumpCommand{std::move( rhs.m_pJumpCommand )},
-	m_pDuckCommand{std::move( rhs.m_pDuckCommand )},
-	m_pFireCommand{std::move( rhs.m_pFireCommand )}
-{
-
-}
-
-CommandHandler& CommandHandler::operator=( CommandHandler&& rhs ) noexcept
-{
-	std::swap( this->m_pJumpCommand, rhs.m_pJumpCommand );
-	std::swap( this->m_pDuckCommand, rhs.m_pDuckCommand );
-	std::swap( this->m_pFireCommand, rhs.m_pFireCommand );
-	return *this;
 }

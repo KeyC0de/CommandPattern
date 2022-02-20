@@ -3,33 +3,6 @@
 #include <memory>
 
 
-namespace
-{
-
-enum class CommandId
-{
-	JUMP = 1,
-	DUCK,
-	FIRE
-};
-
-inline std::size_t getNextUniqueTypeId()
-{
-	static std::size_t id = 0;
-	std::size_t result = id;
-	++id;
-	return result;
-}
-
-template<typename T>
-constexpr std::size_t type_id()
-{
-	static std::size_t typeId = getNextUniqueTypeId();
-	return typeId;
-}
-
-}
-
 template<typename T>
 class Command
 {
@@ -40,7 +13,6 @@ class Command
 	//      thus support for undoable operations comes with the doubling of memory required per a Command object (n levels on undo means * n amount of storage required)
 	//template<typename T>
 	//std::stack<Command<T>> m_commands;
-	static inline int typeId;
 protected:
 	explicit Command( int state,
 		int previousState,
@@ -54,11 +26,6 @@ protected:
 			"Derived class doesn't inherit from Command! Exiting.." );
 	}
 public:
-	constexpr int getTypeId()
-	{
-		typeId = static_cast<int>( type_id<Command<T>>() );
-		return typeId;
-	}
 
 	Command( const Command& rhs ) = delete;
 	Command& operator=( const Command& rhs ) = delete;
@@ -69,7 +36,7 @@ public:
 		m_previousState{std::move( rhs.m_previousState )},
 		m_nextState{std::move( rhs.m_nextState )}
 	{
-		typeId = type_id<Command<T>>();
+
 	}
 	
 	Command& operator=( Command&& rhs ) noexcept
@@ -148,44 +115,32 @@ public:
 //	\author	KeyC0de
 //	\date	2020/11/04 0:25
 //
-//	\brief	owns and handles the commands
+//	\brief	handles the commands
 //=============================================================
 class CommandHandler final
 {
-private:
-	std::unique_ptr<JumpCommand> m_pJumpCommand;
-	std::unique_ptr<DuckCommand> m_pDuckCommand;
-	std::unique_ptr<FireCommand> m_pFireCommand;
 public:
-	explicit CommandHandler();
-	CommandHandler( JumpCommand* jmpCmd, DuckCommand* duckCmd, FireCommand* fireCmd );
+	CommandHandler() = default;
 	~CommandHandler() = default;
 
 	CommandHandler( const CommandHandler& ) = delete;
 	CommandHandler& operator=( const CommandHandler& ) = delete;
-	CommandHandler( CommandHandler&& rhs ) noexcept;
-	CommandHandler& operator=( CommandHandler&& rhs ) noexcept;
 	
-	//===================================================
-	//	\function	executeCommand
-	//	\brief  dispatches commands
-	//	\date	2020/11/04 0:26
 	template<typename T>
 	void executeCommand( Command<T>& command )
 	{
-		switch( command.getTypeId() )
-		{
-		case static_cast<int>( CommandId::JUMP ):
-			command.execute();
-			break;
-		case static_cast<int>( CommandId::DUCK ):
-			command.execute();
-			break;
-		case static_cast<int>( CommandId::FIRE ):
-			command.execute();
-			break;
-		default:
-			break;
-		}
+		command.execute();
+	}
+
+	template<typename T>
+	void undoCommand( Command<T>& command )
+	{
+		command.undo();
+	}
+
+	template<typename T>
+	void redoCommand( Command<T>& command )
+	{
+		command.redo();
 	}
 };
